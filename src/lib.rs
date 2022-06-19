@@ -4,6 +4,10 @@ pub unsafe trait ObjcObject {
     fn as_id(&self) -> &objc::runtime::Object;
     fn as_id_mut(&mut self) -> &mut objc::runtime::Object;
 }
+unsafe impl ObjcObject for objc::runtime::Object {
+    fn as_id(&self) -> &objc::runtime::Object { self }
+    fn as_id_mut(&mut self) -> &mut objc::runtime::Object { self }
+}
 
 #[macro_export]
 macro_rules! DefineObjcObjectWrapper {
@@ -17,8 +21,8 @@ macro_rules! DefineObjcObjectWrapper {
         $v struct $tyname(objc::runtime::Object);
         $crate::DefineObjcObjectWrapper!(ext_struct $tyname : $super);
     };
-    
-    (ext_struct $tyname: ty) => {
+
+    (ext_struct $tyname: ident) => {
         unsafe impl $crate::ObjcObject for $tyname {
             fn as_id(&self) -> &objc::runtime::Object { &self.0 }
             fn as_id_mut(&mut self) -> &mut objc::runtime::Object { &mut self.0 }
