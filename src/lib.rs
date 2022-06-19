@@ -10,13 +10,22 @@ macro_rules! DefineObjcObjectWrapper {
     ($v: vis $tyname: ident) => {
         #[repr(C)]
         $v struct $tyname(objc::runtime::Object);
+        $crate::DefineObjcObjectWrapper!(ext_struct $tyname);
+    };
+    ($v: vis $tyname: ident : $super: ty) => {
+        #[repr(C)]
+        $v struct $tyname(objc::runtime::Object);
+        $crate::DefineObjcObjectWrapper!(ext_struct $tyname : $super);
+    };
+    
+    (ext_struct $tyname: ty) => {
         unsafe impl $crate::ObjcObject for $tyname {
             fn as_id(&self) -> &objc::runtime::Object { &self.0 }
             fn as_id_mut(&mut self) -> &mut objc::runtime::Object { &mut self.0 }
         }
     };
-    ($v: vis $tyname: ident : $super: ty) => {
-        $crate::DefineObjcObjectWrapper!($v $tyname);
+    (ext_struct $tyname: ty : $super: ty) => {
+        $crate::DefineObjcObjectWrapper!(ext_struct $tyname);
         impl std::ops::Deref for $tyname {
             type Target = $super;
             fn deref(&self) -> &Self::Target {
@@ -28,7 +37,7 @@ macro_rules! DefineObjcObjectWrapper {
                 unsafe { std::mem::transmute(self) }
             }
         }
-    };
+    }
 }
 
 #[macro_export]
