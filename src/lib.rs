@@ -8,6 +8,10 @@ unsafe impl ObjcObject for objc::runtime::Object {
     fn as_id(&self) -> &objc::runtime::Object { self }
     fn as_id_mut(&mut self) -> &mut objc::runtime::Object { self }
 }
+unsafe impl<T> ObjcObject for &'_ mut T where T: ObjcObject {
+    fn as_id(&self) -> &objc::runtime::Object { T::as_id(self) }
+    fn as_id_mut(&mut self) -> &mut objc::runtime::Object { T::as_id_mut(self) }
+}
 
 #[macro_export]
 macro_rules! DefineObjcObjectWrapper {
