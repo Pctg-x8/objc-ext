@@ -32,7 +32,7 @@ macro_rules! DefineObjcObjectWrapper {
             fn as_id_mut(&mut self) -> &mut objc::runtime::Object { &mut self.0 }
         }
     };
-    (ext_struct $tyname: ty : $super: ty) => {
+    (ext_struct $tyname: ident : $super: ty) => {
         $crate::DefineObjcObjectWrapper!(ext_struct $tyname);
         impl std::ops::Deref for $tyname {
             type Target = $super;
