@@ -1,16 +1,26 @@
-
 /// An marker for FFI safe object with objective-c
 pub unsafe trait ObjcObject {
     fn as_id(&self) -> &objc::runtime::Object;
     fn as_id_mut(&mut self) -> &mut objc::runtime::Object;
 }
 unsafe impl ObjcObject for objc::runtime::Object {
-    fn as_id(&self) -> &objc::runtime::Object { self }
-    fn as_id_mut(&mut self) -> &mut objc::runtime::Object { self }
+    fn as_id(&self) -> &objc::runtime::Object {
+        self
+    }
+    fn as_id_mut(&mut self) -> &mut objc::runtime::Object {
+        self
+    }
 }
-unsafe impl<T> ObjcObject for &'_ mut T where T: ObjcObject {
-    fn as_id(&self) -> &objc::runtime::Object { T::as_id(self) }
-    fn as_id_mut(&mut self) -> &mut objc::runtime::Object { T::as_id_mut(self) }
+unsafe impl<T> ObjcObject for &'_ mut T
+where
+    T: ObjcObject,
+{
+    fn as_id(&self) -> &objc::runtime::Object {
+        T::as_id(self)
+    }
+    fn as_id_mut(&mut self) -> &mut objc::runtime::Object {
+        T::as_id_mut(self)
+    }
 }
 
 #[macro_export]
@@ -30,6 +40,16 @@ macro_rules! DefineObjcObjectWrapper {
         unsafe impl $crate::ObjcObject for $tyname {
             fn as_id(&self) -> &objc::runtime::Object { &self.0 }
             fn as_id_mut(&mut self) -> &mut objc::runtime::Object { &mut self.0 }
+        }
+        unsafe impl objc::Encode for &'_ $t {
+            fn encode() -> objc::Encoding {
+                <&objc::runtime::Object as objc::Encode>::encode()
+            }
+        }
+        unsafe impl objc::Encode for &'_ mut $t {
+            fn encode() -> objc::Encoding {
+                <&mut objc::runtime::Object as objc::Encode>::encode()
+            }
         }
     };
     (ext_struct $tyname: ident : $super: ty) => {
@@ -56,6 +76,16 @@ macro_rules! IdObject {
         unsafe impl $crate::ObjcObject for $name {
             fn as_id(&self) -> &objc::runtime::Object { &self.0 }
             fn as_id_mut(&mut self) -> &mut objc::runtime::Object { &mut self.0 }
+        }
+        unsafe impl objc::Encode for &'_ $name {
+            fn encode() -> objc::Encoding {
+                <&objc::runtime::Object as objc::Encode>::encode()
+            }
+        }
+        unsafe impl objc::Encode for &'_ mut $name {
+            fn encode() -> objc::Encoding {
+                <&mut objc::runtime::Object as objc::Encode>::encode()
+            }
         }
         $(unsafe impl $p for $name {})+
     }
