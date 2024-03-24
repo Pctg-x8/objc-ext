@@ -51,6 +51,16 @@ macro_rules! DefineObjcObjectWrapper {
                 <&mut objc::runtime::Object as objc::Encode>::encode()
             }
         }
+        unsafe impl objc::Encode for *const $tyname {
+            fn encode() -> objc::Encoding {
+                <*const objc::runtime::Object as objc::Encode>::encode()
+            }
+        }
+        unsafe impl objc::Encode for *mut $tyname {
+            fn encode() -> objc::Encoding {
+                <*mut objc::runtime::Object as objc::Encode>::encode()
+            }
+        }
     };
     (ext_struct $tyname: ident : $super: ty) => {
         $crate::DefineObjcObjectWrapper!(ext_struct $tyname);
