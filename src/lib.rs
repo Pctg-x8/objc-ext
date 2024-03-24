@@ -41,12 +41,12 @@ macro_rules! DefineObjcObjectWrapper {
             fn as_id(&self) -> &objc::runtime::Object { &self.0 }
             fn as_id_mut(&mut self) -> &mut objc::runtime::Object { &mut self.0 }
         }
-        unsafe impl objc::Encode for &'_ $t {
+        unsafe impl objc::Encode for &'_ $tyname {
             fn encode() -> objc::Encoding {
                 <&objc::runtime::Object as objc::Encode>::encode()
             }
         }
-        unsafe impl objc::Encode for &'_ mut $t {
+        unsafe impl objc::Encode for &'_ mut $tyname {
             fn encode() -> objc::Encoding {
                 <&mut objc::runtime::Object as objc::Encode>::encode()
             }
