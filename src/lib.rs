@@ -92,13 +92,6 @@ macro_rules! DefineObjcObjectWrapper {
                 self.0.verify_message::<A, R>(sel)
             }
         }
-        impl objc::MessageArguments for $tyname {
-            #[inline(always)]
-            unsafe fn invoke<R>(imp: objc::runtime::Imp, obj: *mut objc::runtime::Object, sel: objc::runtime::Sel, args: Self) -> R
-                        where R: std::any::Any {
-                <objc::runtime::Object as objc::MessageArguments>::invoke::<R>(imp, obj, sel, args.0)
-            }
-        }
     };
     (__ext_struct $tyname: ident : $super: ty) => {
         $crate::DefineObjcObjectWrapper!(__ext_struct $tyname);
