@@ -83,20 +83,20 @@ macro_rules! DefineObjcObjectWrapper {
             unsafe fn send_message<A, R>(&self, sel: objc::runtime::Sel, args: A)
                         -> Result<R, objc::MessageError>
                         where Self: Sized, A: objc::MessageArguments, R: std::any::Any {
-                self.0.send_message(sel, args)
+                self.0.send_message::<A, R>(sel, args)
             }
         
             #[inline(always)]
             fn verify_message<A, R>(&self, sel: objc::runtime::Sel) -> Result<(), objc::MessageError>
                         where Self: Sized, A: objc::EncodeArguments, R: objc::Encode {
-                self.0.verify_message(sel)
+                self.0.verify_message::<A, R>(sel)
             }
         }
         impl objc::MessageArguments for $tyname {
             #[inline(always)]
             unsafe fn invoke<R>(imp: objc::runtime::Imp, obj: *mut objc::runtime::Object, sel: objc::runtime::Sel, args: Self) -> R
                         where R: std::any::Any {
-                <objc::runtime::Object as objc::MessageArguments>::invoke(imp, obj, sel, args.0)
+                <objc::runtime::Object as objc::MessageArguments>::invoke::<R>(imp, obj, sel, args.0)
             }
         }
     };
